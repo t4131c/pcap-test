@@ -21,6 +21,7 @@ void usage() {
     printf("syntax: pcap-test <interface>\n");
     printf("sample: pcap-test wlan0\n");
 }
+
 void myprint(const char* str, const uint8_t* packet, int chk){
     if(chk == MAC){
         printf(str);
@@ -79,6 +80,7 @@ int main(int argc, char* argv[]) {
         }
 
         struct packet_info *p_info = (struct packet_info*) packet;
+
         if(ntohs(p_info->ethernet.ether_type) != ETHERTYPE_IP){
             printf("not ip\n");
             continue;
@@ -91,9 +93,6 @@ int main(int argc, char* argv[]) {
         myprint("src mac : ",p_info->ethernet.ether_shost, MAC);
         myprint("dst mac : ",p_info->ethernet.ether_dhost, MAC);
 
-
-        struct libnet_ipv4_hdr *ip = (struct libnet_ipv4_hdr*) (packet+sizeof(struct libnet_ethernet_hdr));
-
         myprint("src ip : ",(uint8_t *) &(p_info->ipv4.ip_src), IP);
         myprint("dst ip : ",(uint8_t *) &(p_info->ipv4.ip_dst), IP);
 
@@ -103,6 +102,7 @@ int main(int argc, char* argv[]) {
 
         int start_data = sizeof(struct libnet_ethernet_hdr) + sizeof(struct libnet_ipv4_hdr) + (p_info->tcp.th_off * sizeof(uint32_t));
         int end_data = header->caplen;
+        
         printf("data\n");
         for(int i = start_data; i < end_data && i < start_data + 16; i++){
             printf("%02x ", packet[i]);
